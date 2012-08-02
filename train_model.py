@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import svmutil
+import matplotlib.pyplot as plt
 
 class GammaCPair(object):
 	"""docstring for GammaCPair"""
@@ -14,14 +15,41 @@ class GammaCPair(object):
 		return '-t 2 -q -gamma {0} -C {1}'
 
 def main():
-	y, x = svmutil.svm_read_problem('char_recon')
+	y, x = svmutil.svm_read_problem("char_recon_shuffled.db")
+	t_examples, t_acc, v_acc = svm_learning_curve(x, y)
+	plt.plot(t_examples, t_acc, label = "train accuracy")
+	plt.plot(t_examples, v_acc, label = "validation accuracy")
+	plt.legend()
+	plt.grid(True)
+	plt.savefig("learning_curve_C100.png")
 
+def svm_learning_curve(x, y):
+	m = len(y)
+	n = len(x)
+	steep = m / 100;
 
-	prob  = svmutil.svm_problem(y[:2000], x[:2000])
-	param = svmutil.svm_parameter('-t 2 -q')
+	training_examples = []
+	train_accuracy = []
+	validation_accuracy = []
 
-	m = svmutil.svm_train(prob, param)
-	p_label, p_acc, p_val = svmutil.svm_predict(y[2000:], x[2000:], m)
+	for i in range(steep, m, steep):
+		prob  = svmutil.svm_problem(y[:i], x[:i])
+		param = svmutil.svm_parameter('-t 2 -q -c 100')
+		m = svmutil.svm_train(prob, param)
+		
+		p_label_train, p_acc_train, p_val_train = svmutil.svm_predict(y[:i], x[:i], m)
+		p_label_validation, p_acc_validation, p_val_validation = svmutil.svm_predict(y[i:], x[i:], m)
+		print p_acc_train[0], "\t", p_acc_validation[0], "\n"
+
+		training_examples.append(i)
+		train_accuracy.append(p_acc_train[0])
+		validation_accuracy.append(p_acc_validation[0])
+
+	return training_examples, train_accuracy, validation_accuracy
+
+def get_cross_val(x, y, gamma_c):
+	pass
+
 
 if __name__ == '__main__':
-		main()	
+		main()

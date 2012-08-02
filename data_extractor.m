@@ -14,13 +14,17 @@ clc;
 num_files = 100;
 num_instances_per_file = 26;
 m = num_files * num_instances_per_file;
-n = 40 * 40;
+n = 20 * 20;
 
 X = zeros(m, n);
 y = zeros(m, 1);
 labels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J",...
           "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",...
           "U", "V", "W", "X", "Y", "Z"]';
+
+% Debug label
+
+DEBUG = 0;
 
 % ciclo sobre todas las imagenes disponibles
 
@@ -47,7 +51,7 @@ for i = 1:100,
         end
 
         x = x(min_h: max_h, min_v: max_v);
-        x = imresize(x, [40 40], 'bicubic');
+        x = imresize(x, [20 20], 'bicubic');
 
         X(id, :) = x(:);
         y(id) = j + 1; 
@@ -65,4 +69,4 @@ save data.mat X y labels
 % Write .txt data
 
 save data.txt X -ascii
-save labels.txt labels -ascii
+save labels.txt y -ascii

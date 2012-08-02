@@ -28,3 +28,6 @@ pip-log.txt
 
 # octave
 octave-core
+
+#C++
+char_recon
