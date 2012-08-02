@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import svmutil
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 class GammaCPair(object):
@@ -34,7 +36,7 @@ def svm_learning_curve(x, y):
 
 	for i in range(steep, m, steep):
 		prob  = svmutil.svm_problem(y[:i], x[:i])
-		param = svmutil.svm_parameter('-t 2 -q -c 100')
+		param = svmutil.svm_parameter('-t 2 -q -c 0.01')
 		m = svmutil.svm_train(prob, param)
 		
 		p_label_train, p_acc_train, p_val_train = svmutil.svm_predict(y[:i], x[:i], m)
