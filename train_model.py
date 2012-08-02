@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import svmutil
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import multiprocessing
 import numpy as np
@@ -78,4 +80,4 @@ def get_cross_val(x, y, x_val, y_val, gamma_c):
 
 
 if __name__ == '__main__':
-        main()
+		main()
