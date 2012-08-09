@@ -25,9 +25,14 @@ def main():
     x_val = x[1800:]
     y_val = y[1800:]
 
-    gamma_c_pairs = [GammaCPair(2 ** log_gamma, 2 ** log_C)
-                     for log_gamma in np.arange(-5, 15)
-                     for log_C     in np.arange(-15, 3)
+    gamma_c_pairs = [GammaCPair(1.0 / (2.0 * (3.0 ** log_sigma) ** 2), 3.0 ** log_C)
+                     for log_sigma in [7]
+                     for log_C     in [3]
+                    ]
+
+    log_log_pairs = [[log_sigma, log_C]
+                     for log_sigma in np.arange(6, 10, 0.5)
+                     for log_C     in np.arange(0, 5, 0.5)
                     ]
 
     def cv(gamma_c):
@@ -40,10 +45,8 @@ def main():
 
     f = open("gamma_c", "w")
     for i in range(len(gamma_c_pairs)):
-        f.write("{0}   {1}   {2}\n".format(gamma_c_pairs[i].gamma, gamma_c_pairs[i].C, cross_val[i]))
+        f.write("{0}   {1}   {2}\n".format(log_log_pairs[i][0], log_log_pairs[i][1], cross_val[i]))
     f.close()
-    
-
 
 def svm_learning_curve(x, y):
     m = len(y)
@@ -73,6 +76,8 @@ def get_cross_val(x, y, x_val, y_val, gamma_c):
     prob  = svmutil.svm_problem(y, x)
     param = svmutil.svm_parameter('-t 2 -q -c {0} -g {1}'.format(gamma_c.C, gamma_c.gamma))
     m = svmutil.svm_train(prob, param)
+
+    svmutil.svm_save_model("model", m)
 
     p_label_validation, p_acc_validation, p_val_validation = svmutil.svm_predict(y_val, x_val, m)
 
