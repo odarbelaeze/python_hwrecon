@@ -1,9 +1,13 @@
 import pygame, sys
 import numpy as np
 import scipy as sp
-import pylab as pl
 import svmutil as sv
 pygame.init()
+
+DEBUG = False
+
+if DEBUG:
+    import pylab as pl
 
 LETTERS = [
     "A",
@@ -22,16 +26,19 @@ LETTERS = [
     "N",
     "O",
     "P",
+    "Q",
     "R",
     "S",
     "T",
     "U",
     "V",
     "W",
+    "X",
     "Y",
     "Z"
 ]
 
+print len(LETTERS)
 
 def predecir(surface, model):
     I = pygame.surfarray.array3d(surface)
@@ -57,12 +64,17 @@ def predecir(surface, model):
     max_v = min(np.ceil(np.mean([max(y_mask), min(y_mask)]) + range_x / 2.0), surface.get_width());
 
     x = J[min_h: max_h, min_v: max_v]
-    x = sp.misc.imresize(x, [20, 20], 'bicubic')
-    x = list(x.rehape(-1, order = 'F'))
+    x = sp.misc.imresize(x, [20, 20])
+
+    if DEBUG:
+        pl.imshow(x, cmap = pl.cm.gray)
+        pl.show()
+
+    x = list(x.reshape(-1, order = 'F'))
 
     a = sv.svm_predict([-1], [x], model)
 
-    return LETTERS(a[0][0])
+    return LETTERS[int(a[0][0]) - 1]
 
 
 def main():
@@ -76,15 +88,39 @@ def main():
 
     screen = pygame.display.set_mode(size)
 
-    pygame.display.set_caption("Reconocedor de caracteres.")
+    pygame.display.set_caption("HW_Recon | Ingrese un caracter.")
 
-    
+    data_flag = False
+    last_pos = []
+
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
 
-        screen.fill(black)
+        mg = pygame.mouse.get_pressed()
+        mpos = pygame.mouse.get_pos()
+
+        if mg == (0,0,1) and data_flag:
+            a = predecir(screen, model)
+            print a
+            pygame.display.set_caption("HW_Recon| Letra: {0}".format(a))
+
+        if mg == (1,0,0) and not last_pos:
+            last_pos = mpos
+            data_flag = True
+
+        if mg == (1,0,0) and last_pos:
+            if np.linalg.norm(np.array(mpos) - np.array(last_pos)) < 20:
+                pygame.draw.line(screen, white, last_pos, mpos, 30)
+            last_pos = mpos
+
+        if mg == (0,1,0) and data_flag:
+            data_flag = False
+            last_pos = []
+            screen.fill(black)
+            pygame.display.set_caption("HW_Recon | Ingrese un caracter.")
+
         pygame.display.flip()
 
 if __name__ == '__main__':

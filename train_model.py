@@ -85,4 +85,10 @@ def get_cross_val(x, y, x_val, y_val, gamma_c):
 
 
 if __name__ == '__main__':
-		main()
+    y, x = svmutil.svm_read_problem("char_recon_shuffled.db")
+    gamma = 1.0 / (2.0 * (3.0 ** 7) ** 2)
+    C = 3.0 ** 3.0
+    prob  = svmutil.svm_problem(y, x)
+    param = svmutil.svm_parameter('-t 2 -q -c {0} -g {1}'.format(C, gamma))
+    m = svmutil.svm_train(prob, param)
+    svmutil.svm_save_model("model", m)
