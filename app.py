@@ -38,7 +38,7 @@ LETTERS = [
     "Z"
 ]
 
-print len(LETTERS)
+if DEBUG: print len(LETTERS)
 
 def predecir(surface, model):
     I = pygame.surfarray.array3d(surface)
@@ -103,7 +103,7 @@ def main():
 
         if mg == (0,0,1) and data_flag:
             a = predecir(screen, model)
-            print a
+            if DEBUG: print a
             pygame.display.set_caption("HW_Recon| Letra: {0}".format(a))
 
         if mg == (1,0,0) and not last_pos:
@@ -111,7 +111,7 @@ def main():
             data_flag = True
 
         if mg == (1,0,0) and last_pos:
-            if np.linalg.norm(np.array(mpos) - np.array(last_pos)) < 20:
+            if np.linalg.norm(np.array(mpos) - np.array(last_pos)) < 30:
                 pygame.draw.line(screen, white, last_pos, mpos, 30)
             last_pos = mpos
 
